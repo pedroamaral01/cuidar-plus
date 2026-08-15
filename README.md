@@ -158,7 +158,7 @@ Em desenvolvimento. Etapas concluídas:
 
 - [x] **1. Fundação** — Laravel 13, React 19, Inertia 2, Tailwind 4, Breeze, MySQL, Reverb e Docker funcionando
 - [x] **2. Banco** — migrations, models, relacionamentos, enums e seeders de demonstração
-- [ ] 3. Arquitetura em camadas
+- [x] **3. Arquitetura em camadas** — repositories + interfaces, services, DTOs, policies e middleware de perfil
 - [ ] 4. Autenticação e perfis
 - [ ] 5. Administração
 - [ ] 6. Telas do paciente
