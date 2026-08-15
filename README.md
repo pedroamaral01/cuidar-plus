@@ -176,9 +176,9 @@ Em desenvolvimento. Etapas concluídas:
 - [x] **6. Paciente — núcleo** — dispositivo, orientações com abas, sinais de alerta, lembretes com calendário semanal e diário
 - [x] **6b. Paciente — complementares** — conteúdos educativos com favoritos, perfil e o ponto de entrada de "Falar com a equipe"
 - [x] **7. Notificações** — Events, Listeners, Notifications (`database` + `broadcast`), canal privado do Reverb, agendador e central do paciente
-- [ ] 8. Testes
-- [ ] 9. Visual e responsividade
-- [ ] 10. Seed de demonstração
+- [x] **8. Testes** — 201 PHPUnit (unitário, integração, Feature) + 43 Cypress E2E + 7 Component Testing
+- [x] **9. Visual e responsividade** — sidebar no desktop, barra inferior + painel "Mais" no celular, cobertos por teste
+- [x] **10. Seed de demonstração** — dispositivos, orientações, alertas, conteúdos e 3 contas
 - [ ] 11. Deploy
 
 ## Autor

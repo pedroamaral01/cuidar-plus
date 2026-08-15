@@ -252,9 +252,18 @@ export default function LayoutDoAplicativo({ titulo, secaoAtiva, children }) {
                         onClick={() => setMaisAberto(false)}
                     />
 
-                    <div className="rounded-t-3xl bg-creme p-5 pb-8">
+                    {/* Folha modal: anunciada como diálogo para leitores de tela. */}
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="titulo-do-painel-mais"
+                        className="rounded-t-3xl bg-creme p-5 pb-8"
+                    >
                         <div className="mb-4 flex items-center justify-between">
-                            <h2 className="font-display text-lg font-bold text-marinho">
+                            <h2
+                                id="titulo-do-painel-mais"
+                                className="font-display text-lg font-bold text-marinho"
+                            >
                                 Mais
                             </h2>
                             <button
