@@ -1,59 +1,41 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\ConfirmablePasswordController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\VerifyEmailController;
+declare(strict_types=1);
+
+use App\Http\Controllers\Autenticacao\CadastroDePacienteController;
+use App\Http\Controllers\Autenticacao\RecuperacaoDeSenhaController;
+use App\Http\Controllers\Autenticacao\SenhaController;
+use App\Http\Controllers\Autenticacao\SessaoController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
+Route::middleware('guest')->group(function (): void {
+    // Acesso
+    Route::get('entrar', [SessaoController::class, 'mostrarFormulario'])->name('login');
+    // O limite que o paciente enxerga são 6 tentativas com senha errada por
+    // minuto, aplicado no AcessoRequest — ele devolve uma mensagem no
+    // formulário em vez de uma página 429. O throttle da rota é só uma
+    // barreira contra flood, com folga para não disparar antes daquele.
+    Route::post('entrar', [SessaoController::class, 'entrar'])
+        ->middleware('throttle:30,1')
+        ->name('login.entrar');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    // Cadastro do paciente em 3 passos
+    Route::get('cadastro', [CadastroDePacienteController::class, 'mostrarFormulario'])->name('cadastro.criar');
+    Route::post('cadastro', [CadastroDePacienteController::class, 'salvar'])->name('cadastro.salvar');
 
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
-        ->name('login');
-
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
-
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
-
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->name('password.email');
-
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
-
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+    // Recuperação de senha
+    Route::get('esqueci-a-senha', [RecuperacaoDeSenhaController::class, 'mostrarFormularioDeSolicitacao'])
+        ->name('senha.solicitar');
+    Route::post('esqueci-a-senha', [RecuperacaoDeSenhaController::class, 'enviarLink'])
+        ->middleware('throttle:6,1')
+        ->name('senha.enviar-link');
+    Route::get('redefinir-senha/{token}', [RecuperacaoDeSenhaController::class, 'mostrarFormularioDeRedefinicao'])
+        ->name('senha.redefinir');
+    Route::post('redefinir-senha', [RecuperacaoDeSenhaController::class, 'redefinir'])
+        ->name('senha.atualizar');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('verify-email', EmailVerificationPromptController::class)
-        ->name('verification.notice');
-
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
-
-    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
-
-    Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
-        ->name('password.confirm');
-
-    Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
-
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
-
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
+Route::middleware('auth')->group(function (): void {
+    Route::put('senha', [SenhaController::class, 'atualizar'])->name('senha.trocar');
+    Route::post('sair', [SessaoController::class, 'sair'])->name('logout');
 });

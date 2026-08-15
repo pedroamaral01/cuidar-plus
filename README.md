@@ -104,9 +104,18 @@ Todas são as portas padrão de cada serviço, e são configuráveis no `.env` (
 docker compose exec app php artisan test
 docker compose exec app php artisan test --testsuite=Unit
 
-# frontend (Cypress)
-docker compose run --rm cypress npx cypress run
+# frontend (Cypress, end-to-end)
+docker compose stop node                              # desliga o Vite dev server
+docker compose run --rm node npm run build            # gera os assets de produção
+docker compose --profile testes run --rm cypress npx cypress run --e2e
+
+# voltar ao modo de desenvolvimento
+docker compose up -d node
 ```
+
+> O Cypress roda **dentro da rede do compose** e acessa a aplicação como `http://nginx`. Nesse contexto ele não alcança o Vite dev server (que responde em `localhost:5173` na máquina do desenvolvedor), então os testes E2E rodam contra os assets compilados. Por isso os dois passos antes do `cypress run`.
+
+Os testes E2E usam as contas do seeder e criam e-mails com timestamp no cadastro, então podem ser repetidos sem precisar recriar o banco.
 
 ### Contas de demonstração
 
@@ -159,7 +168,7 @@ Em desenvolvimento. Etapas concluídas:
 - [x] **1. Fundação** — Laravel 13, React 19, Inertia 2, Tailwind 4, Breeze, MySQL, Reverb e Docker funcionando
 - [x] **2. Banco** — migrations, models, relacionamentos, enums e seeders de demonstração
 - [x] **3. Arquitetura em camadas** — repositories + interfaces, services, DTOs, policies e middleware de perfil
-- [ ] 4. Autenticação e perfis
+- [x] **4. Autenticação e perfis** — acesso, cadastro em 3 passos, recuperação de senha, Shell responsivo e separação paciente/administrador
 - [ ] 5. Administração
 - [ ] 6. Telas do paciente
 - [ ] 7. Notificações (Events/Listeners/Notifications + Reverb)

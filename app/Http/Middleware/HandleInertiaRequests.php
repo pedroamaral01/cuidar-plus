@@ -30,10 +30,17 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $usuario = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'usuario' => $this->dadosDoUsuarioAutenticado($request->user()),
+                'usuario' => $this->dadosDoUsuarioAutenticado($usuario),
+            ],
+            // Badge do sino, presente em toda a navegação.
+            'naoLidas' => fn (): int => $usuario?->unreadNotifications()->count() ?? 0,
+            'flash' => [
+                'status' => fn () => $request->session()->get('status'),
             ],
         ];
     }

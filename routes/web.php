@@ -1,27 +1,38 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
+declare(strict_types=1);
+
+use App\Http\Controllers\Administracao\PainelController;
+use App\Http\Controllers\Paciente\InicioController;
+use App\Support\DestinoPorPerfil;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
+/**
+ * A raiz manda cada um para o seu lugar: visitante para o acesso, paciente
+ * para o Início, administrador para o painel.
+ */
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+    return redirect(DestinoPorPerfil::rotaInicial(request()->user()));
+})->name('raiz');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// ---------------------------------------------------------------------------
+// Área do paciente
+// ---------------------------------------------------------------------------
+Route::middleware(['auth', 'paciente'])
+    ->prefix('inicio')
+    ->name('paciente.')
+    ->group(function (): void {
+        Route::get('/', [InicioController::class, 'mostrar'])->name('inicio');
+    });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+// ---------------------------------------------------------------------------
+// Área administrativa
+// ---------------------------------------------------------------------------
+Route::middleware(['auth', 'administrador'])
+    ->prefix('administracao')
+    ->name('administracao.')
+    ->group(function (): void {
+        Route::get('/', [PainelController::class, 'mostrar'])->name('painel');
+    });
 
 require __DIR__.'/auth.php';
