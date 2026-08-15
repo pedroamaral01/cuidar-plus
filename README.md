@@ -183,23 +183,6 @@ cuidar-plus/
 └── docker-compose.yml
 ```
 
-## Status
-
-Todas as etapas do plano (seção 13 de ) estão concluídas:
-
-- [x] **1. Fundação** — Laravel 13, React 19, Inertia 2, Tailwind 4, Breeze, MySQL, Reverb e Docker funcionando
-- [x] **2. Banco** — migrations, models, relacionamentos, enums e seeders de demonstração
-- [x] **3. Arquitetura em camadas** — repositories + interfaces, services, DTOs, policies e middleware de perfil
-- [x] **4. Autenticação e perfis** — acesso, cadastro em 3 passos, recuperação de senha, Shell responsivo e separação paciente/administrador
-- [x] **5. Administração** — painel, CRUDs de dispositivos, orientações, alertas e conteúdos, lista de pacientes e auditoria de notificações
-- [x] **6. Paciente — núcleo** — dispositivo, orientações com abas, sinais de alerta, lembretes com calendário semanal e diário
-- [x] **6b. Paciente — complementares** — conteúdos educativos com favoritos, perfil e o ponto de entrada de "Falar com a equipe"
-- [x] **7. Notificações** — Events, Listeners, Notifications (`database` + `broadcast`), canal privado do Reverb, agendador e central do paciente
-- [x] **8. Testes** — 201 PHPUnit (unitário, integração, Feature) + 43 Cypress E2E + 7 Component Testing
-- [x] **9. Visual e responsividade** — sidebar no desktop, barra inferior + painel "Mais" no celular, cobertos por teste
-- [x] **10. Seed de demonstração** — dispositivos, orientações, alertas, conteúdos e 3 contas
-- [x] **11. Deploy** — stack de produção com TLS, wss, OPcache e conferência pós-deploy
-
 ## Autor
 
-Pedro
+Pedro Henrique Amaral Estevão
