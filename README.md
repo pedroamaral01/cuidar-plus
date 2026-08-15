@@ -170,7 +170,7 @@ Em desenvolvimento. Etapas concluídas:
 - [x] **3. Arquitetura em camadas** — repositories + interfaces, services, DTOs, policies e middleware de perfil
 - [x] **4. Autenticação e perfis** — acesso, cadastro em 3 passos, recuperação de senha, Shell responsivo e separação paciente/administrador
 - [x] **5. Administração** — painel, CRUDs de dispositivos, orientações, alertas e conteúdos, lista de pacientes e auditoria de notificações
-- [ ] 6. Telas do paciente
+- [x] **6. Paciente — núcleo** — dispositivo, orientações com abas, sinais de alerta, lembretes com calendário semanal e diário
 - [ ] 7. Notificações (Events/Listeners/Notifications + Reverb)
 - [ ] 8. Testes
 - [ ] 9. Visual e responsividade

@@ -36,6 +36,18 @@ class RegistroDeCuidadoRepository implements RegistroDeCuidadoRepositoryInterfac
             ->get();
     }
 
+    public function buscarIdsDeLembretesConcluidosNoDia(Usuario $paciente, Carbon $dia): array
+    {
+        return RegistroDeCuidado::doPaciente($paciente->id)
+            ->whereNotNull('lembrete_id')
+            ->whereDate('realizado_em', $dia->toDateString())
+            ->pluck('lembrete_id')
+            ->map(fn ($id): int => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     public function contarPorTipoNoPeriodo(Usuario $paciente, Carbon $inicio, Carbon $fim): array
     {
         return RegistroDeCuidado::doPaciente($paciente->id)

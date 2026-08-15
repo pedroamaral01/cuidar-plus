@@ -25,4 +25,12 @@ interface RegistroDeCuidadoRepositoryInterface
      * @return array<string, int> tipo => quantidade
      */
     public function contarPorTipoNoPeriodo(Usuario $paciente, Carbon $inicio, Carbon $fim): array;
+
+    /**
+     * Ids dos lembretes que o paciente já concluiu no dia informado — é o que
+     * marca o "feito" na lista de lembretes daquele dia.
+     *
+     * @return list<int>
+     */
+    public function buscarIdsDeLembretesConcluidosNoDia(Usuario $paciente, Carbon $dia): array;
 }

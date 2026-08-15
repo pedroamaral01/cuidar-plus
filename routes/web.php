@@ -9,7 +9,12 @@ use App\Http\Controllers\Administracao\OrientacaoController;
 use App\Http\Controllers\Administracao\PacienteController;
 use App\Http\Controllers\Administracao\PainelController;
 use App\Http\Controllers\Administracao\SinalDeAlertaController;
+use App\Http\Controllers\Paciente\DiarioController;
+use App\Http\Controllers\Paciente\DispositivoController as DispositivoDoPacienteController;
 use App\Http\Controllers\Paciente\InicioController;
+use App\Http\Controllers\Paciente\LembreteController;
+use App\Http\Controllers\Paciente\OrientacaoController as OrientacaoDoPacienteController;
+use App\Http\Controllers\Paciente\SinalDeAlertaController as SinalDeAlertaDoPacienteController;
 use App\Support\DestinoPorPerfil;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +34,29 @@ Route::middleware(['auth', 'paciente'])
     ->name('paciente.')
     ->group(function (): void {
         Route::get('/', [InicioController::class, 'mostrar'])->name('inicio');
+
+        // Meu dispositivo
+        Route::get('meu-dispositivo', [DispositivoDoPacienteController::class, 'mostrar'])->name('dispositivo');
+        Route::put('meu-dispositivo', [DispositivoDoPacienteController::class, 'definir'])->name('dispositivo.definir');
+
+        // Orientações
+        Route::get('orientacoes', [OrientacaoDoPacienteController::class, 'index'])->name('orientacoes.index');
+        Route::get('orientacoes/{orientacao}', [OrientacaoDoPacienteController::class, 'show'])->name('orientacoes.show');
+
+        // Sinais de alerta
+        Route::get('sinais-de-alerta', [SinalDeAlertaDoPacienteController::class, 'index'])->name('alertas');
+
+        // Lembretes
+        Route::get('lembretes', [LembreteController::class, 'index'])->name('lembretes.index');
+        Route::post('lembretes', [LembreteController::class, 'store'])->name('lembretes.store');
+        Route::put('lembretes/{lembrete}', [LembreteController::class, 'update'])->name('lembretes.update');
+        Route::patch('lembretes/{lembrete}/alternar', [LembreteController::class, 'alternar'])->name('lembretes.alternar');
+        Route::post('lembretes/{lembrete}/concluir', [LembreteController::class, 'concluir'])->name('lembretes.concluir');
+        Route::delete('lembretes/{lembrete}', [LembreteController::class, 'destroy'])->name('lembretes.destroy');
+
+        // Diário / histórico
+        Route::get('diario', [DiarioController::class, 'mostrar'])->name('diario');
+        Route::post('diario', [DiarioController::class, 'registrar'])->name('diario.registrar');
     });
 
 // ---------------------------------------------------------------------------

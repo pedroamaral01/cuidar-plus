@@ -161,7 +161,16 @@ export default function LayoutDoAplicativo({ titulo, secaoAtiva, children }) {
                     </div>
                 </div>
 
-                <main className="flex-1 overflow-y-auto px-4 py-5 pb-24 md:px-8 md:pb-8">
+                {/*
+                  scroll-region avisa o Inertia de que a rolagem da página
+                  acontece aqui, e não na janela. Sem isso, a rolagem não volta
+                  ao topo depois de uma ação e o paciente não vê a confirmação,
+                  que fica no início da tela.
+                */}
+                <main
+                    scroll-region="true"
+                    className="flex-1 overflow-y-auto px-4 py-5 pb-24 md:px-8 md:pb-8"
+                >
                     <div className="mx-auto w-full max-w-5xl">{children}</div>
                 </main>
             </div>
