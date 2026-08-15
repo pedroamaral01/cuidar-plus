@@ -9,7 +9,10 @@ use App\Http\Controllers\Administracao\OrientacaoController;
 use App\Http\Controllers\Administracao\PacienteController;
 use App\Http\Controllers\Administracao\PainelController;
 use App\Http\Controllers\Administracao\SinalDeAlertaController;
+use App\Http\Controllers\Paciente\ConteudoEducativoController as ConteudoDoPacienteController;
 use App\Http\Controllers\Paciente\DiarioController;
+use App\Http\Controllers\Paciente\EquipeController;
+use App\Http\Controllers\Paciente\PerfilController;
 use App\Http\Controllers\Paciente\DispositivoController as DispositivoDoPacienteController;
 use App\Http\Controllers\Paciente\InicioController;
 use App\Http\Controllers\Paciente\LembreteController;
@@ -57,6 +60,19 @@ Route::middleware(['auth', 'paciente'])
         // Diário / histórico
         Route::get('diario', [DiarioController::class, 'mostrar'])->name('diario');
         Route::post('diario', [DiarioController::class, 'registrar'])->name('diario.registrar');
+
+        // Conteúdos educativos
+        Route::get('conteudos', [ConteudoDoPacienteController::class, 'index'])->name('conteudos');
+        Route::get('conteudos/{conteudo}', [ConteudoDoPacienteController::class, 'show'])->name('conteudos.show');
+        Route::post('conteudos/{conteudo}/favorito', [ConteudoDoPacienteController::class, 'alternarFavorito'])
+            ->name('conteudos.favorito');
+
+        // Perfil
+        Route::get('perfil', [PerfilController::class, 'mostrar'])->name('perfil');
+        Route::put('perfil', [PerfilController::class, 'atualizar'])->name('perfil.atualizar');
+
+        // Falar com a equipe — somente o ponto de entrada (ver seção 5.4).
+        Route::get('falar-com-a-equipe', [EquipeController::class, 'mostrar'])->name('equipe');
     });
 
 // ---------------------------------------------------------------------------
