@@ -1,7 +1,9 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white" alt="Laravel 13">
+  <img src="https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white" alt="PHP 8.4">
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19">
   <img src="https://img.shields.io/badge/Inertia.js-2-9553E9?logo=inertia&logoColor=white" alt="Inertia.js">
+  <img src="https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4">
   <img src="https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white" alt="MySQL 8">
   <img src="https://img.shields.io/badge/Reverb-WebSocket-FF2D20?logo=laravel&logoColor=white" alt="Laravel Reverb">
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker">
@@ -50,16 +52,17 @@ O sistema tem dois perfis:
 
 | Camada | Tecnologia |
 |---|---|
-| Backend | PHP 8.3 + Laravel 13 |
-| Frontend | React 19 + Tailwind CSS |
+| Backend | PHP 8.4 + Laravel 13 |
+| Frontend | React 19 + Tailwind CSS 4 |
 | Integração | Inertia.js 2 |
 | Banco de dados | MySQL 8 |
 | Tempo real | Laravel Reverb (WebSocket) |
 | Autenticação | Laravel Breeze (stack Inertia/React) |
-| Testes | Pest 4 |
+| Testes — backend | PHPUnit 12 (unitário, integração, Feature) |
+| Testes — frontend | Cypress (E2E + Component Testing) |
 | Ambiente | Docker + Docker Compose |
 
-Arquitetura: monólito em camadas (Controller → Form Request → Service → Repository → Model), com nomenclatura de domínio em português.
+Arquitetura: monólito em camadas (Controller → Form Request → Service → Repository → Model), com nomenclatura de domínio em português (classe, arquivo **e** método).
 
 ## Como rodar o projeto
 
@@ -73,26 +76,36 @@ cd cuidar-plus
 # copiar o .env de exemplo
 cp .env.example .env
 
-# subir os containers (app, MySQL, Reverb)
+# subir os containers (app, nginx, MySQL, Reverb, worker de fila, Vite)
 docker compose build
 docker compose up -d
 
-# instalar dependências, gerar chave, migrar e popular o banco
+# instalar dependências PHP, gerar chave e preparar o banco
 docker compose exec app composer install
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate --seed
-
-# instalar dependências do front e compilar
-docker compose exec app npm install
-docker compose exec app npm run dev
 ```
 
-A aplicação fica disponível em `http://localhost` (porta configurável no `.env`).
+O serviço `node` instala as dependências de frontend e sobe o Vite automaticamente na primeira subida.
+
+| O quê | Endereço |
+|---|---|
+| Aplicação | http://localhost:8080 |
+| Vite (dev server) | http://localhost:5173 |
+| MySQL | `localhost:3306` |
+| Reverb (diagnóstico direto) | `localhost:8081` |
+
+As portas são configuráveis no `.env` (`APP_PORT`, `VITE_PORT`, `DB_PORT_EXTERNO`, `REVERB_PORT_EXTERNO`).
 
 ### Rodando os testes
 
 ```bash
+# backend (PHPUnit) — usa o banco separado cuidar_plus_teste
 docker compose exec app php artisan test
+docker compose exec app php artisan test --testsuite=Unit
+
+# frontend (Cypress)
+docker compose run --rm cypress npx cypress run
 ```
 
 ## Estrutura do projeto
@@ -100,29 +113,48 @@ docker compose exec app php artisan test
 ```
 cuidar-plus/
 ├── README.md
-├── app/                       # Controllers, Services, Repositories, Models...
-│   ├── Http/
+├── CLAUDE.md                  # convenções obrigatórias do projeto
+├── docs/                      # especificação (visão, arquitetura, testes, plano)
+├── prototipo/                 # referência visual e de UX validada
+├── app/
+│   ├── Http/                  # Controllers, Requests, Middleware
+│   ├── Models/
 │   ├── Services/
-│   ├── Repositories/
-│   ├── Events/
-│   ├── Notifications/
-│   └── Policies/
-├── resources/js/              # páginas e componentes React/Inertia
-│   ├── Pages/
-│   ├── Components/
-│   └── Layouts/
+│   ├── Repositories/          # Contracts/ + Eloquent/
+│   ├── Events/ Listeners/ Notifications/
+│   ├── Enums/ DTOs/ Policies/
+│   └── Providers/
+├── resources/
+│   ├── css/app.css            # tokens de marca (Tailwind 4 @theme)
+│   └── js/                    # Pages/, Components/, Layouts/ (React + Inertia)
 ├── routes/
 │   ├── web.php
-│   └── channels.php
+│   ├── auth.php
+│   └── channels.php           # canais privados do Reverb
 ├── database/
 │   ├── migrations/
 │   └── seeders/
+├── tests/                     # Unit/, Integration/, Feature/ (PHPUnit)
+├── cypress/                   # e2e/, component/
+├── docker/                    # php/, nginx/, mysql/
 └── docker-compose.yml
 ```
 
 ## Status
 
-Em desenvolvimento.
+Em desenvolvimento. Etapas concluídas:
+
+- [x] **1. Fundação** — Laravel 13, React 19, Inertia 2, Tailwind 4, Breeze, MySQL, Reverb e Docker funcionando
+- [ ] 2. Banco — migrations, models, relacionamentos e seeders
+- [ ] 3. Arquitetura em camadas
+- [ ] 4. Autenticação e perfis
+- [ ] 5. Administração
+- [ ] 6. Telas do paciente
+- [ ] 7. Notificações (Events/Listeners/Notifications + Reverb)
+- [ ] 8. Testes
+- [ ] 9. Visual e responsividade
+- [ ] 10. Seed de demonstração
+- [ ] 11. Deploy
 
 ## Autor
 

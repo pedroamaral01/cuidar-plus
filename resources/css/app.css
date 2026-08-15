@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../../resources/views/**/*.blade.php';
+@source '../../resources/js/**/*.jsx';
+
+/*
+ * Tokens de marca do Cuidar+ — extraídos do protótipo validado
+ * (prototipo/cuidar-plus-prototipo.jsx).
+ */
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Quicksand', ui-sans-serif, system-ui, sans-serif;
+
+    --color-teal-profundo: #163832;
+    --color-teal: #2f9c8f;
+    --color-teal-suave: #dceeea;
+    --color-creme: #fbf9f4;
+    --color-marinho: #1b2c3d;
+    --color-coral: #e8785f;
+    --color-coral-suave: #fbe4df;
+    --color-ambar: #c98a1e;
+    --color-ambar-suave: #fcefd3;
+    --color-lavanda: #7a6bb0;
+    --color-lavanda-suave: #eae6f7;
+    --color-cinza: #6b7a77;
+
+    --shadow-cartao: 0 1px 3px rgba(22, 56, 50, 0.08);
+}
+
+@layer base {
+    body {
+        background-color: var(--color-creme);
+        color: var(--color-marinho);
+        font-family: var(--font-sans);
+    }
+}
+
+/* Anel de progresso do painel/diário — pulsa suavemente, respeitando
+   quem prefere menos movimento. */
+@keyframes pulsar-anel {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.035);
+    }
+}
+
+.anel-vitalidade {
+    animation: pulsar-anel 3.2s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .anel-vitalidade {
+        animation: none;
+    }
+}
