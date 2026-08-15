@@ -16,6 +16,7 @@ use App\Http\Controllers\Paciente\PerfilController;
 use App\Http\Controllers\Paciente\DispositivoController as DispositivoDoPacienteController;
 use App\Http\Controllers\Paciente\InicioController;
 use App\Http\Controllers\Paciente\LembreteController;
+use App\Http\Controllers\Paciente\NotificacaoController;
 use App\Http\Controllers\Paciente\OrientacaoController as OrientacaoDoPacienteController;
 use App\Http\Controllers\Paciente\SinalDeAlertaController as SinalDeAlertaDoPacienteController;
 use App\Support\DestinoPorPerfil;
@@ -70,6 +71,13 @@ Route::middleware(['auth', 'paciente'])
         // Perfil
         Route::get('perfil', [PerfilController::class, 'mostrar'])->name('perfil');
         Route::put('perfil', [PerfilController::class, 'atualizar'])->name('perfil.atualizar');
+
+        // Central de notificações
+        Route::get('notificacoes', [NotificacaoController::class, 'index'])->name('notificacoes');
+        Route::patch('notificacoes/lidas', [NotificacaoController::class, 'marcarTodasComoLidas'])
+            ->name('notificacoes.todas-lidas');
+        Route::patch('notificacoes/{notificacao}', [NotificacaoController::class, 'marcarComoLida'])
+            ->name('notificacoes.lida');
 
         // Falar com a equipe — somente o ponto de entrada (ver seção 5.4).
         Route::get('falar-com-a-equipe', [EquipeController::class, 'mostrar'])->name('equipe');

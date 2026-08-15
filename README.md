@@ -111,6 +111,9 @@ docker compose --profile testes run --rm cypress npx cypress run --e2e
 
 # voltar ao modo de desenvolvimento
 docker compose up -d node
+
+# frontend (Cypress) — component testing, não precisa da aplicação no ar
+docker compose --profile testes run --rm cypress npx cypress run --component
 ```
 
 > O Cypress roda **dentro da rede do compose** e acessa a aplicação como `http://nginx`. Nesse contexto ele não alcança o Vite dev server (que responde em `localhost:5173` na máquina do desenvolvedor), então os testes E2E rodam contra os assets compilados. Por isso os dois passos antes do `cypress run`.
@@ -172,7 +175,7 @@ Em desenvolvimento. Etapas concluídas:
 - [x] **5. Administração** — painel, CRUDs de dispositivos, orientações, alertas e conteúdos, lista de pacientes e auditoria de notificações
 - [x] **6. Paciente — núcleo** — dispositivo, orientações com abas, sinais de alerta, lembretes com calendário semanal e diário
 - [x] **6b. Paciente — complementares** — conteúdos educativos com favoritos, perfil e o ponto de entrada de "Falar com a equipe"
-- [ ] 7. Notificações (Events/Listeners/Notifications + Reverb)
+- [x] **7. Notificações** — Events, Listeners, Notifications (`database` + `broadcast`), canal privado do Reverb, agendador e central do paciente
 - [ ] 8. Testes
 - [ ] 9. Visual e responsividade
 - [ ] 10. Seed de demonstração

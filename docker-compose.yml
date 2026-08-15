@@ -77,7 +77,9 @@ services:
     container_name: cuidar-plus-queue
     restart: unless-stopped
     working_dir: /var/www/html
-    command: php artisan queue:work --tries=3 --timeout=90
+    # --sleep=1 encurta a espera entre varreduras da fila: a notificação do
+    # paciente é algo que ele espera ver "na hora", não em até 3 segundos.
+    command: php artisan queue:work --tries=3 --timeout=90 --sleep=1
     volumes:
       - .:/var/www/html
     depends_on:
@@ -103,7 +105,7 @@ services:
   # Testes de frontend. Sobe sob demanda:
   #   docker compose run --rm cypress npx cypress run
   cypress:
-    image: cypress/included:15.6.0
+    image: cypress/included:15.20.1
     container_name: cuidar-plus-cypress
     profiles: ["testes"]
     working_dir: /var/www/html

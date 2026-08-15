@@ -10,6 +10,11 @@ export const CONTAS = {
 };
 
 Cypress.Commands.add('entrarComo', (conta) => {
+    // Garante que não há sessão anterior. Sem isso, o /entrar redireciona
+    // para a área do usuário já logado e o formulário nem aparece — o que
+    // acontece, por exemplo, quando um hook before() deixou uma sessão aberta.
+    cy.clearCookies();
+
     cy.visit('/entrar');
     cy.get('#email').clear().type(conta.email);
     cy.get('#password').clear().type(conta.senha, { log: false });
@@ -31,4 +36,34 @@ Cypress.Commands.add('sair', () => {
  */
 Cypress.Commands.add('emailDeTeste', () => {
     return cy.wrap(`paciente.teste.${Date.now()}@exemplo.com`, { log: false });
+});
+
+/**
+ * Espera o servidor já responder com o texto na rota informada.
+ *
+ * As notificações são processadas por um worker de fila, então não estão
+ * prontas no instante em que a equipe publica algo. Além disso, o Cypress roda
+ * dentro da rede do compose e o WebSocket do Reverb aponta para o host do
+ * desenvolvedor — o empurrão em tempo real não chega neste ambiente. Estes
+ * testes verificam o caminho persistente (channel `database`); o caminho
+ * WebSocket é verificado à parte (handshake 101 pelo nginx e publicação do
+ * evento no Reverb).
+ *
+ * A espera acontece via cy.request (usando os cookies da sessão) em vez de
+ * recarregar a página: recarregar em laço deixava o teste instável, porque a
+ * verificação caía sobre um documento já substituído.
+ */
+Cypress.Commands.add('esperarNoServidor', (rota, texto, tentativasRestantes = 20) => {
+    cy.request(rota).then((resposta) => {
+        if (resposta.body.includes(texto)) {
+            return;
+        }
+
+        if (tentativasRestantes <= 0) {
+            throw new Error(`"${texto}" não chegou em ${rota} a tempo.`);
+        }
+
+        cy.wait(1000);
+        cy.esperarNoServidor(rota, texto, tentativasRestantes - 1);
+    });
 });

@@ -65,7 +65,12 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    /*
+     * Os lembretes do paciente são horários do dia dele ("trocar a bolsa às
+     * 08:00"). Com a aplicação em UTC, o agendador avisaria 3 horas fora do
+     * horário combinado. Por isso o fuso vem do .env (America/Sao_Paulo).
+     */
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------

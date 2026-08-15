@@ -1,8 +1,14 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+declare(strict_types=1);
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+use Illuminate\Support\Facades\Schedule;
+
+/**
+ * A cada minuto o sistema verifica quais lembretes entraram na hora e dispara
+ * as notificações. `withoutOverlapping` evita duas varreduras concorrentes se
+ * uma execução demorar mais que um minuto.
+ */
+Schedule::command('cuidar:avisar-lembretes')
+    ->everyMinute()
+    ->withoutOverlapping();

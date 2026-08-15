@@ -4,6 +4,8 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Bell, LogOut, MoreHorizontal, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import useNotificacoesEmTempoReal from '@/Components/Notificacoes/useNotificacoesEmTempoReal';
+
 import {
     fixosNaBarraInferior,
     navegacaoDoPerfil,
@@ -18,6 +20,10 @@ export default function LayoutDoAplicativo({ titulo, secaoAtiva, children }) {
     const perfil = auth.usuario?.perfil ?? 'paciente';
 
     const [maisAberto, setMaisAberto] = useState(false);
+
+    // O badge do sino acompanha as notificações em tempo real em qualquer
+    // tela, sem o paciente precisar recarregar a página.
+    useNotificacoesEmTempoReal(['naoLidas']);
 
     // Só entram na navegação os itens cuja rota já existe no backend.
     const itens = navegacaoDoPerfil(perfil).filter((item) =>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Administracao;
 
+use App\Events\SinalDeAlertaCadastrado;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Administracao\SalvarSinalDeAlertaRequest;
 use App\Models\Dispositivo;
@@ -43,11 +44,14 @@ class SinalDeAlertaController extends Controller
 
     public function store(SalvarSinalDeAlertaRequest $request): RedirectResponse
     {
-        SinalDeAlerta::create($request->validated());
+        $sinal = SinalDeAlerta::create($request->validated());
+
+        // Avisa os pacientes alcançados. O Listener decide quem recebe.
+        SinalDeAlertaCadastrado::dispatch($sinal);
 
         return redirect()
             ->route('administracao.alertas.index')
-            ->with('status', 'Sinal de alerta cadastrado.');
+            ->with('status', 'Sinal de alerta cadastrado. Os pacientes foram avisados.');
     }
 
     public function edit(SinalDeAlerta $alerta): Response
