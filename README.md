@@ -108,6 +108,18 @@ docker compose exec app php artisan test --testsuite=Unit
 docker compose run --rm cypress npx cypress run
 ```
 
+### Contas de demonstração
+
+Criadas pelo `php artisan migrate --seed` (senha `senha1234` para todas):
+
+| Perfil | E-mail | Dispositivo |
+|---|---|---|
+| Administrador | `admin@cuidarplus.local` | — |
+| Paciente | `maria@cuidarplus.local` | Colostomia |
+| Paciente | `joao@cuidarplus.local` | Sonda vesical |
+
+> São dois pacientes de propósito: a regra de isolamento (paciente A nunca acessa dado do paciente B) fica demonstrável.
+
 ## Estrutura do projeto
 
 ```
@@ -145,7 +157,7 @@ cuidar-plus/
 Em desenvolvimento. Etapas concluídas:
 
 - [x] **1. Fundação** — Laravel 13, React 19, Inertia 2, Tailwind 4, Breeze, MySQL, Reverb e Docker funcionando
-- [ ] 2. Banco — migrations, models, relacionamentos e seeders
+- [x] **2. Banco** — migrations, models, relacionamentos, enums e seeders de demonstração
 - [ ] 3. Arquitetura em camadas
 - [ ] 4. Autenticação e perfis
 - [ ] 5. Administração

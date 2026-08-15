@@ -49,11 +49,11 @@ class ProfileController extends Controller
             'password' => ['required', 'current_password'],
         ]);
 
-        $user = $request->user();
+        $usuario = $request->user();
 
         Auth::logout();
 
-        $user->delete();
+        $usuario->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

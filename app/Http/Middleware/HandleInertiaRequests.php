@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -32,8 +33,35 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'usuario' => $this->dadosDoUsuarioAutenticado($request->user()),
             ],
         ];
+    }
+
+    /**
+     * Dados mínimos do usuário logado compartilhados com todas as telas.
+     * Nunca expõe senha, token ou dado de outro paciente.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function dadosDoUsuarioAutenticado(?Usuario $usuario): ?array
+    {
+        if ($usuario === null) {
+            return null;
+        }
+
+        return [
+            'id' => $usuario->id,
+            'nome' => $usuario->nome,
+            'email' => $usuario->email,
+            'perfil' => $usuario->perfil->value,
+            'iniciais' => $this->extrairIniciais($usuario->nome),
+        ];
+    }
+
+    /** "Maria Aparecida" -> "M"; usado no avatar do cabeçalho. */
+    private function extrairIniciais(string $nome): string
+    {
+        return mb_strtoupper(mb_substr(trim($nome), 0, 1));
     }
 }

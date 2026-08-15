@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,10 +12,10 @@ class ProfileTest extends TestCase
 
     public function test_profile_page_is_displayed(): void
     {
-        $user = User::factory()->create();
+        $usuario = Usuario::factory()->create();
 
         $response = $this
-            ->actingAs($user)
+            ->actingAs($usuario)
             ->get('/profile');
 
         $response->assertOk();
@@ -23,12 +23,12 @@ class ProfileTest extends TestCase
 
     public function test_profile_information_can_be_updated(): void
     {
-        $user = User::factory()->create();
+        $usuario = Usuario::factory()->create();
 
         $response = $this
-            ->actingAs($user)
+            ->actingAs($usuario)
             ->patch('/profile', [
-                'name' => 'Test User',
+                'nome' => 'Maria Teste',
                 'email' => 'test@example.com',
             ]);
 
@@ -36,39 +36,39 @@ class ProfileTest extends TestCase
             ->assertSessionHasNoErrors()
             ->assertRedirect('/profile');
 
-        $user->refresh();
+        $usuario->refresh();
 
-        $this->assertSame('Test User', $user->name);
-        $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
+        $this->assertSame('Maria Teste', $usuario->nome);
+        $this->assertSame('test@example.com', $usuario->email);
+        $this->assertNull($usuario->email_verified_at);
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
     {
-        $user = User::factory()->create();
+        $usuario = Usuario::factory()->create();
 
         $response = $this
-            ->actingAs($user)
+            ->actingAs($usuario)
             ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => $user->email,
+                'nome' => 'Maria Teste',
+                'email' => $usuario->email,
             ]);
 
         $response
             ->assertSessionHasNoErrors()
             ->assertRedirect('/profile');
 
-        $this->assertNotNull($user->refresh()->email_verified_at);
+        $this->assertNotNull($usuario->refresh()->email_verified_at);
     }
 
     public function test_user_can_delete_their_account(): void
     {
-        $user = User::factory()->create();
+        $usuario = Usuario::factory()->create();
 
         $response = $this
-            ->actingAs($user)
+            ->actingAs($usuario)
             ->delete('/profile', [
-                'password' => 'password',
+                'password' => 'senha1234',
             ]);
 
         $response
@@ -76,15 +76,15 @@ class ProfileTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        $this->assertNull($usuario->fresh());
     }
 
     public function test_correct_password_must_be_provided_to_delete_account(): void
     {
-        $user = User::factory()->create();
+        $usuario = Usuario::factory()->create();
 
         $response = $this
-            ->actingAs($user)
+            ->actingAs($usuario)
             ->from('/profile')
             ->delete('/profile', [
                 'password' => 'wrong-password',
@@ -94,6 +94,6 @@ class ProfileTest extends TestCase
             ->assertSessionHasErrors('password')
             ->assertRedirect('/profile');
 
-        $this->assertNotNull($user->fresh());
+        $this->assertNotNull($usuario->fresh());
     }
 }
