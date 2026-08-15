@@ -90,12 +90,12 @@ O serviço `node` instala as dependências de frontend e sobe o Vite automaticam
 
 | O quê | Endereço |
 |---|---|
-| Aplicação | http://localhost:8080 |
+| Aplicação | http://localhost |
 | Vite (dev server) | http://localhost:5173 |
 | MySQL | `localhost:3306` |
-| Reverb (diagnóstico direto) | `localhost:8081` |
+| Reverb (diagnóstico direto) | `localhost:8080` |
 
-As portas são configuráveis no `.env` (`APP_PORT`, `VITE_PORT`, `DB_PORT_EXTERNO`, `REVERB_PORT_EXTERNO`).
+Todas são as portas padrão de cada serviço, e são configuráveis no `.env` (`APP_PORT`, `VITE_PORT`, `DB_PORT_EXTERNO`, `REVERB_PORT_EXTERNO`). Se outro projeto local estiver ocupando alguma delas, pare aquela stack (`docker compose stop`) — os projetos não precisam rodar ao mesmo tempo.
 
 ### Rodando os testes
 
