@@ -1,0 +1,72 @@
+# ---------------------------------------------------------------------------
+# Estágio 1 — assets do frontend
+# ---------------------------------------------------------------------------
+FROM node:22-bookworm-slim AS assets
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY vite.config.js ./
+COPY resources ./resources
+RUN npm run build
+
+# ---------------------------------------------------------------------------
+# Estágio 2 — dependências PHP, sem as de desenvolvimento
+# ---------------------------------------------------------------------------
+FROM composer:2 AS dependencias
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+RUN composer install \
+        --no-dev \
+        --no-scripts \
+        --no-interaction \
+        --prefer-dist \
+        --optimize-autoloader
+
+# ---------------------------------------------------------------------------
+# Estágio 3 — imagem final
+# ---------------------------------------------------------------------------
+FROM php:8.4-fpm-bookworm
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        unzip \
+        libzip-dev \
+        libicu-dev \
+        libpng-dev \
+        libjpeg62-turbo-dev \
+        libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" \
+        pdo_mysql \
+        bcmath \
+        intl \
+        zip \
+        gd \
+        exif \
+        pcntl \
+    && docker-php-ext-enable opcache \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/cuidar.ini
+COPY docker/php/opcache-producao.ini /usr/local/etc/php/conf.d/opcache.ini
+
+WORKDIR /var/www/html
+
+COPY . .
+COPY --from=dependencias /app/vendor ./vendor
+COPY --from=assets /app/public/build ./public/build
+
+# O PHP-FPM roda como www-data; só storage e cache precisam ser graváveis.
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R ug+rwX storage bootstrap/cache
+
+USER www-data
+
+EXPOSE 9000
+
+CMD ["php-fpm"]

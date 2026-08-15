@@ -1,0 +1,105 @@
+# Stack de produção do Cuidar+.
+#
+#   docker compose -f docker-compose.producao.yml up -d --build
+#
+# Diferenças em relação ao ambiente de desenvolvimento:
+# - a imagem carrega o código e os assets já compilados (sem bind mount);
+# - não há serviço Vite nem Cypress;
+# - o nginx termina TLS e o WebSocket é wss://;
+# - Reverb, worker de fila e agendador rodam como serviços persistentes.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.producao
+    image: cuidar-plus-app-producao
+    restart: always
+    env_file: .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - cuidar
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile.producao
+    image: cuidar-plus-nginx-producao
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMINIO: ${DOMINIO}
+    volumes:
+      - certificados:/etc/letsencrypt:ro
+      - certbot:/var/www/certbot
+    depends_on:
+      - app
+      - reverb
+    networks:
+      - cuidar
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql-dados:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks:
+      - cuidar
+
+  reverb:
+    image: cuidar-plus-app-producao
+    restart: always
+    env_file: .env
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    depends_on:
+      - app
+    networks:
+      - cuidar
+
+  # As Notifications implementam ShouldQueue: sem worker, nada é entregue.
+  queue:
+    image: cuidar-plus-app-producao
+    restart: always
+    env_file: .env
+    command: php artisan queue:work --tries=3 --timeout=90 --sleep=1 --max-time=3600
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - cuidar
+
+  # Sem o agendador, cuidar:avisar-lembretes nunca roda e o paciente não é
+  # avisado no horário do lembrete.
+  scheduler:
+    image: cuidar-plus-app-producao
+    restart: always
+    env_file: .env
+    command: php artisan schedule:work
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - cuidar
+
+networks:
+  cuidar:
+    driver: bridge
+
+volumes:
+  mysql-dados:
+  certificados:
+  certbot:

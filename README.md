@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white" alt="MySQL 8">
   <img src="https://img.shields.io/badge/Reverb-WebSocket-FF2D20?logo=laravel&logoColor=white" alt="Laravel Reverb">
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker">
-  <img src="https://img.shields.io/badge/status-em%20desenvolvimento-yellow" alt="Status">
+  <img src="https://img.shields.io/badge/status-MVP%20conclu%C3%ADdo-brightgreen" alt="Status">
 </p>
 
 # Cuidar+
@@ -88,6 +88,8 @@ docker compose exec app php artisan migrate --seed
 
 O serviço `node` instala as dependências de frontend e sobe o Vite automaticamente na primeira subida.
 
+Sobem sete serviços: `app` (PHP-FPM), `nginx`, `mysql`, `reverb` (WebSocket), `queue` (worker da fila), `scheduler` (agendador dos lembretes) e `node` (Vite). Os três últimos precisam estar de pé para as notificações funcionarem — sem `queue` nada é entregue, e sem `scheduler` o lembrete nunca dispara no horário.
+
 | O quê | Endereço |
 |---|---|
 | Aplicação | http://localhost |
@@ -132,6 +134,23 @@ Criadas pelo `php artisan migrate --seed` (senha `senha1234` para todas):
 
 > São dois pacientes de propósito: a regra de isolamento (paciente A nunca acessa dado do paciente B) fica demonstrável.
 
+## Deploy
+
+A stack de produção fica em arquivos separados, sem Vite, sem Cypress e sem bind mount do código:
+
+```bash
+cp .env.producao.example .env          # ajuste domínio, senhas e chaves do Reverb
+docker compose -f docker-compose.producao.yml up -d --build
+
+docker compose -f docker-compose.producao.yml exec app php artisan key:generate
+docker compose -f docker-compose.producao.yml exec app php artisan migrate --force
+docker compose -f docker-compose.producao.yml exec app php artisan config:cache
+docker compose -f docker-compose.producao.yml exec app php artisan route:cache
+docker compose -f docker-compose.producao.yml exec app php artisan view:cache
+```
+
+O nginx de produção termina TLS, redireciona `http://` para `https://` e faz o upgrade do WebSocket em `wss://`. A conferência pós-deploy está em [docs/03-testes-seguranca-deploy.md](docs/03-testes-seguranca-deploy.md), seção 12.3.
+
 ## Estrutura do projeto
 
 ```
@@ -166,7 +185,7 @@ cuidar-plus/
 
 ## Status
 
-Em desenvolvimento. Etapas concluídas:
+Todas as etapas do plano (seção 13 de ) estão concluídas:
 
 - [x] **1. Fundação** — Laravel 13, React 19, Inertia 2, Tailwind 4, Breeze, MySQL, Reverb e Docker funcionando
 - [x] **2. Banco** — migrations, models, relacionamentos, enums e seeders de demonstração
@@ -179,7 +198,7 @@ Em desenvolvimento. Etapas concluídas:
 - [x] **8. Testes** — 201 PHPUnit (unitário, integração, Feature) + 43 Cypress E2E + 7 Component Testing
 - [x] **9. Visual e responsividade** — sidebar no desktop, barra inferior + painel "Mais" no celular, cobertos por teste
 - [x] **10. Seed de demonstração** — dispositivos, orientações, alertas, conteúdos e 3 contas
-- [ ] 11. Deploy
+- [x] **11. Deploy** — stack de produção com TLS, wss, OPcache e conferência pós-deploy
 
 ## Autor
 

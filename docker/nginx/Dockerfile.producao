@@ -1,0 +1,25 @@
+# Imagem do nginx já com os arquivos públicos e os assets compilados dentro.
+#
+# A alternativa — compartilhar `public/` com o container da aplicação por um
+# volume nomeado — parece mais simples, mas volumes nomeados só são
+# inicializados quando estão vazios: no segundo deploy o nginx continuaria
+# servindo os assets antigos, silenciosamente.
+
+FROM node:22-bookworm-slim AS assets
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY vite.config.js ./
+COPY resources ./resources
+RUN npm run build
+
+FROM nginx:1.27-alpine
+
+COPY public /var/www/html/public
+COPY --from=assets /app/public/build /var/www/html/public/build
+
+# O envsubst do entrypoint do nginx troca ${DOMINIO} pelo valor do ambiente.
+COPY docker/nginx/producao.conf /etc/nginx/templates/default.conf.template

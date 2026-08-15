@@ -88,6 +88,22 @@ services:
     networks:
       - cuidar
 
+  # Agendador do Laravel. Sem ele o comando cuidar:avisar-lembretes nunca
+  # roda, e o paciente não recebe o aviso do lembrete no horário.
+  scheduler:
+    image: cuidar-plus-app
+    container_name: cuidar-plus-scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: php artisan schedule:work
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - cuidar
+
   node:
     image: node:22-bookworm-slim
     container_name: cuidar-plus-node
