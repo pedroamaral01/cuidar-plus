@@ -169,7 +169,7 @@ Em desenvolvimento. Etapas concluídas:
 - [x] **2. Banco** — migrations, models, relacionamentos, enums e seeders de demonstração
 - [x] **3. Arquitetura em camadas** — repositories + interfaces, services, DTOs, policies e middleware de perfil
 - [x] **4. Autenticação e perfis** — acesso, cadastro em 3 passos, recuperação de senha, Shell responsivo e separação paciente/administrador
-- [ ] 5. Administração
+- [x] **5. Administração** — painel, CRUDs de dispositivos, orientações, alertas e conteúdos, lista de pacientes e auditoria de notificações
 - [ ] 6. Telas do paciente
 - [ ] 7. Notificações (Events/Listeners/Notifications + Reverb)
 - [ ] 8. Testes

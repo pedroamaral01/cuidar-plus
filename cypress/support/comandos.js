@@ -14,6 +14,10 @@ Cypress.Commands.add('entrarComo', (conta) => {
     cy.get('#email').clear().type(conta.email);
     cy.get('#password').clear().type(conta.senha, { log: false });
     cy.contains('button', 'Entrar').click();
+
+    // Espera o redirecionamento terminar. Sem isso, um cy.visit() logo em
+    // seguida aborta o POST do login e o teste segue sem sessão.
+    cy.location('pathname').should('not.eq', '/entrar');
 });
 
 Cypress.Commands.add('sair', () => {

@@ -28,11 +28,18 @@ export default function CampoDeFormulario({
                 )}
             </label>
 
+            {/*
+              Usamos aria-required, e não o `required` nativo: com o `required`
+              o navegador bloqueia o envio e mostra uma bolha no idioma dele,
+              escondendo as mensagens em português validadas no servidor. O
+              servidor é a fonte única de verdade da validação; o aria-required
+              mantém a informação para leitores de tela.
+            */}
             <CampoDeTexto
                 id={id}
                 name={id}
                 erro={erro}
-                required={obrigatorio}
+                aria-required={obrigatorio ? 'true' : undefined}
                 className="mt-1"
                 {...props}
             />

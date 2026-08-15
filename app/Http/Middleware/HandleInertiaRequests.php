@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
             'naoLidas' => fn (): int => $usuario?->unreadNotifications()->count() ?? 0,
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),
+                'erro' => fn () => $request->session()->get('erro'),
             ],
         ];
     }
